@@ -8,18 +8,19 @@
 
 ---
 
-### 🌟 About Me
+## 🌟 About Me
 
 * 🎓 B.Tech CSE Student at SRM Institute of Science and Technology
+* 💻 Passionate about Software Development, AI/ML and Problem Solving
 * 🔭 Currently working on **NeoDigiTech**
-* 🌱 Currently learning **LLMs, Blockchain & Advanced Backend Development**
-* 💬 Ask me about **Java, Full Stack Development, Machine Learning, Node.js, MongoDB, and PalashKart 2.0**
+* 🌱 Currently learning **LLMs, Blockchain and Advanced Backend Development**
+* 💬 Ask me about **Java, Full Stack Development, Node.js, Express.js, MongoDB, Machine Learning**
 * 📫 Reach me at **[nigam.palash@gmail.com](mailto:nigam.palash@gmail.com)**
-* ⚡ Fun Fact: **I speak fluent JAVA... and sometimes English 😄**
+* ⚡ Fun fact: **I speak fluent JAVA... and sometimes English 😄**
 
 ---
 
-### 👤 Connect With Me
+## 🌐 Connect With Me
 
 <p align="left">
 <a href="https://www.linkedin.com/in/palash-nigam-khare/" target="_blank">
@@ -41,81 +42,103 @@
 
 ---
 
-### 🛠️ Languages and Tools
+## 🛠️ Languages and Tools
 
-<p align="left">
+<p align="center">
 <img src="https://skillicons.dev/icons?i=java,cpp,python,javascript,html,css,react,nodejs,express,mongodb,mysql,git,github,vscode,tensorflow,pytorch,arduino" />
 </p>
 
 ---
 
-### 📊 GitHub Statistics
+## 💻 Tech Stack
+
+### Programming Languages
+
+* Java
+* Python
+* C++
+* JavaScript
+
+### Frontend Development
+
+* HTML5
+* CSS3
+* React.js
+* Bootstrap
+
+### Backend Development
+
+* Node.js
+* Express.js
+
+### Database
+
+* MongoDB
+* MySQL
+
+### AI / ML
+
+* TensorFlow
+* PyTorch
+* Machine Learning
+
+### Tools
+
+* Git
+* GitHub
+* VS Code
+* Arduino
+
+---
+
+## 🚀 Featured Projects
+
+### 🛒 PalashKart 2.0
+
+Full Stack E-Commerce Application built using Node.js, Express.js, MongoDB and EJS.
+
+### 🌾 Smart Crop Fertilizer Recommendation System
+
+Machine Learning based solution for crop and fertilizer recommendations.
+
+### 💰 Loan Risk Platform
+
+Risk prediction system using Machine Learning algorithms.
+
+### 🤖 AI & Data Analytics Projects
+
+Projects involving predictive analytics, data visualization and machine learning.
+
+---
+
+## 🎯 Current Goals
+
+* Master Data Structures & Algorithms
+* Become a Strong Full Stack Developer
+* Build Production-Level AI Applications
+* Secure a High-Paying Software Engineering Role
+* Contribute to Open Source Projects
+
+---
+
+## 📈 GitHub Activity
 
 <p align="center">
-  <img height="170" src="https://github-readme-stats.vercel.app/api?username=nigampalash&show_icons=true&theme=tokyonight&hide_border=true" />
-  <img height="170" src="https://github-readme-stats.vercel.app/api/top-langs/?username=nigampalash&layout=compact&theme=tokyonight&hide_border=true" />
+<img src="https://github-readme-activity-graph.vercel.app/graph?username=nigampalash&theme=github-dark" />
 </p>
 
 ---
 
-### 🔥 GitHub Streak
+## 🏅 Achievements
 
-<p align="center">
-  <img src="https://streak-stats.demolab.com?user=nigampalash&theme=tokyonight&hide_border=true" />
-</p>
-
----
-
-### 🏆 GitHub Trophies
-
-<p align="center">
-  <img src="https://github-profile-trophy.vercel.app/?username=nigampalash&theme=tokyonight&row=1&column=6&margin-w=15" />
-</p>
-
----
-
-### 📈 Contribution Graph
-
-<p align="center">
-  <img src="https://github-readme-activity-graph.vercel.app/graph?username=nigampalash&theme=tokyo-night" />
-</p>
-
----
-
-### 🚀 Featured Technologies
-
-<p align="center">
-<img src="https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=java&logoColor=white" />
-<img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" />
-<img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" />
-<img src="https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white" />
-<img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" />
-<img src="https://img.shields.io/badge/Machine%20Learning-FF6F00?style=for-the-badge" />
-</p>
-
----
-
-### 💡 Current Focus
-
-* Full Stack Development
-* Artificial Intelligence & Machine Learning
-* Large Language Models (LLMs)
-* Data Analytics
-* Open Source Contributions
-* Placement Preparation
+* 💡 Hackathon Participant
+* 🤖 AI/ML Project Developer
+* 🌐 Full Stack Developer
+* ☕ Java Enthusiast
+* 📊 Data Analytics Learner
 
 ---
 
 <p align="center">
-  <i>Building solutions, learning continuously, and preparing for impactful software engineering roles.</i>
-</p>
-
-### 📊 GitHub Stats:
-
-<p>
-  <img align="left" src="https://github-readme-stats.vercel.app/api/top-langs?username=nigampalash&show_icons=true&locale=en&layout=compact" alt="Top Languages" />
-</p>
-
-<p>
-  <img align="center" src="https://github-readme-stats.vercel.app/api?username=nigampalash&show_icons=true&locale=en" alt="GitHub Stats" />
+  <b>Building impactful software, learning every day, and preparing for the future 🚀</b>
 </p>
