@@ -12,7 +12,6 @@
 
 * 🎓 B.Tech CSE Student at SRM Institute of Science and Technology
 * 💻 Passionate about Software Development, AI/ML and Problem Solving
-* 🔭 Currently working on **NeoDigiTech**
 * 🌱 Currently learning **LLMs, Blockchain and Advanced Backend Development**
 * 💬 Ask me about **Java, Full Stack Development, Node.js, Express.js, MongoDB, Machine Learning**
 * 📫 Reach me at **[nigam.palash@gmail.com](mailto:nigam.palash@gmail.com)**
