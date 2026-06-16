@@ -1,23 +1,16 @@
+<img src="https://capsule-render.vercel.app/api?type=waving&height=220&color=0:000000,100:00d2ff&text=Palash%20Nigam%20Khare&fontSize=55&fontColor=FFFFFF&animation=fadeIn&fontAlignY=40&desc=Full%20Stack%20Developer%20%7C%20AI/ML%20Enthusiast&descSize=20&descColor=FFFFFF&descAlignY=65" width="100%"/>
+
 <p align="center">
-  <img src="https://raw.githubusercontent.com/nigampalash/nigampalash/main/assets/futuristic_banner.gif" alt="Cover Banner" width="100%" />
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=22&duration=3000&pause=1000&color=00D2FF&center=true&vCenter=true&width=450&lines=Full+Stack+Developer;AI%2FML+Enthusiast;Java+Programmer;Problem+Solver" alt="Typing SVG" />
 </p>
 
-<div align="center">
-  <br/>
-  <a href="https://github.com/nigampalash">
-    <img src="https://github.com/nigampalash.png" width="120" style="border-radius: 50%; border: 3px solid #00d2ff;" alt="Palash Nigam Khare" />
+<p align="center">
+  <a href="https://komarev.com/ghpvc/?username=nigampalash">
+    <img src="https://komarev.com/ghpvc/?username=nigampalash&label=Profile%20views&color=00d2ff&style=flat-square" alt="profile views" />
   </a>
-  <h1 align="center">Palash Nigam Khare</h1>
-  <p align="center">
-    <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=22&duration=3000&pause=1000&color=00D2FF&center=true&vCenter=true&width=450&lines=Full+Stack+Developer;AI%2FML+Enthusiast;Java+Programmer;Problem+Solver" alt="Typing SVG" />
-  </p>
-  <p align="center">
-    <a href="https://komarev.com/ghpvc/?username=nigampalash">
-      <img src="https://komarev.com/ghpvc/?username=nigampalash&label=Profile%20views&color=00d2ff&style=flat-square" alt="profile views" />
-    </a>
-  </p>
-  <br/>
-</div>
+</p>
+
+<img src="https://raw.githubusercontent.com/nigampalash/nigampalash/main/assets/futuristic_banner.gif" alt="Cover Banner" width="100%" />
 
 ## 📌 About Me
 
