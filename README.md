@@ -10,16 +10,8 @@
   </a>
 </p>
 
-<table align="center" width="100%">
-  <tr>
-    <td width="50%" align="center">
-      <img src="https://raw.githubusercontent.com/nigampalash/nigampalash/main/assets/animated_laptop_banner.gif" alt="Laptop Tech Banner" width="100%" />
-    </td>
-    <td width="50%" align="center">
-      <img src="https://raw.githubusercontent.com/nigampalash/nigampalash/main/assets/cyberpunk_code_rain.gif" alt="Cyberpunk Code Rain" width="100%" />
-    </td>
-  </tr>
-</table>
+<img src="https://raw.githubusercontent.com/nigampalash/nigampalash/main/assets/futuristic_banner.gif" alt="Cover Banner" width="100%" />
+
 
 
 ## 📌 About Me
