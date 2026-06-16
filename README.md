@@ -10,7 +10,8 @@
   </a>
 </p>
 
-<img src="https://raw.githubusercontent.com/nigampalash/nigampalash/main/assets/futuristic_banner.gif" alt="Cover Banner" width="100%" />
+<img src="https://raw.githubusercontent.com/nigampalash/nigampalash/main/assets/programmer_workstation.gif" alt="Cover Banner" width="100%" />
+
 
 
 
