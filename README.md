@@ -47,15 +47,12 @@ B.Tech Computer Science student at SRM Institute of Science and Technology, pass
 
 ## 📊 GitHub Stats
 
-<table align="center"><tr><td>
-<img height="180em" src="https://github-readme-stats-eight-theta.vercel.app/api?username=nigampalash&cache_seconds=1800&layout=compact&theme=tokyonight&border_radius=10&count_private=true&include_all_commits=true&v=3" />
-</td><td width="20"></td><td>
-<img height="180em" src="https://streak-stats.demolab.com?user=nigampalash&theme=tokyonight&hide_border=true&cache_seconds=1800&timezone=Asia/Kolkata&v=3" />
-</td></tr></table>
-
 <p align="center">
+  <img height="180em" src="https://github-readme-stats-eight-theta.vercel.app/api?username=nigampalash&cache_seconds=1800&layout=compact&theme=tokyonight&border_radius=10&count_private=true&include_all_commits=true&v=3" />
+  &nbsp;&nbsp;
   <img height="180em" src="https://github-readme-stats-eight-theta.vercel.app/api/top-langs/?username=nigampalash&langs_count=8&layout=compact&theme=tokyonight&border_radius=10&cache_seconds=1800&count_private=true&v=3" />
 </p>
+
 
 
 ## 🛠️ Languages & Tools
