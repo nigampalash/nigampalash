@@ -24,11 +24,7 @@ B.Tech Computer Science student at SRM Institute of Science and Technology, pass
 
 `Mastering DSA` &nbsp; `Production-Level AI Applications` &nbsp; `Open Source Contributions` &nbsp; `High-Impact Software Engineering`
 
-## 🏆 GitHub Trophies
 
-<p align="center">
-  <img src="https://github-profile-trophy.vercel.app/?username=nigampalash&theme=tokyonight&no-bg=true&margin-w=15&column=5" alt="Trophies" />
-</p>
 
 ## 🚀 Featured Projects
 
