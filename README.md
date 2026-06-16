@@ -96,8 +96,7 @@ B.Tech Computer Science student at SRM Institute of Science and Technology, pass
   <a href="https://www.linkedin.com/in/palash-nigam-khare/" target="_blank"><img src="https://img.shields.io/badge/LinkedIn-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" /></a>&nbsp;&nbsp;
   <a href="https://nigampalash.github.io/PALASH-portfolio./" target="_blank"><img src="https://img.shields.io/badge/Portfolio-46BC99?style=for-the-badge&logo=About.me&logoColor=white" alt="Portfolio" /></a>&nbsp;&nbsp;
   <a href="mailto:nigam.palash@gmail.com"><img src="https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Gmail" /></a>&nbsp;&nbsp;
-  <a href="https://www.instagram.com/nigam_palash/" target="_blank"><img src="https://img.shields.io/badge/Instagram-%23E4405F.svg?style=for-the-badge&logo=instagram&logoColor=white" alt="Instagram" /></a>&nbsp;&nbsp;
-  <a href="https://www.codechef.com/users/nigam_palash" target="_blank"><img src="https://img.shields.io/badge/CodeChef-%235B4636.svg?style=for-the-badge&logo=codechef&logoColor=white" alt="CodeChef" /></a>&nbsp;&nbsp;
+  <a href="https://leetcode.com/u/nigampalash/" target="_blank"><img src="https://img.shields.io/badge/LeetCode-%23FFA116.svg?style=for-the-badge&logo=leetcode&logoColor=white" alt="LeetCode" /></a>&nbsp;&nbsp;
   <a href="https://www.hackerrank.com/profile/nigam_palash22" target="_blank"><img src="https://img.shields.io/badge/HackerRank-%232EC866.svg?style=for-the-badge&logo=hackerrank&logoColor=white" alt="HackerRank" /></a>
 </p>
 
