@@ -2,7 +2,125 @@ import urllib.request
 import re
 import os
 import sys
+import json
 from datetime import datetime, timedelta, timezone
+
+def fetch_from_github_api(username, token=None):
+    headers = {'User-Agent': 'Mozilla/5.0'}
+    if token:
+        headers['Authorization'] = f"Bearer {token}"
+        
+    def get_json(url):
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req) as resp:
+            return json.loads(resp.read().decode('utf-8'))
+            
+    try:
+        # 1. Fetch user profile for followers
+        print("Fetching user profile...")
+        user_info = get_json(f"https://api.github.com/users/{username}")
+        followers = user_info.get("followers", 0) if user_info else 0
+        
+        # 2. Fetch repos for stars and languages
+        print("Fetching repositories...")
+        repos = get_json(f"https://api.github.com/users/{username}/repos?per_page=100")
+        total_stars = 0
+        lang_bytes = {}
+        
+        # We will get languages for each non-fork repository
+        for r in repos:
+            if r.get("fork"):
+                continue
+            total_stars += r.get("stargazers_count", 0)
+            
+            # Fetch language details
+            lang_url = r.get("languages_url")
+            if lang_url:
+                try:
+                    langs = get_json(lang_url)
+                    for lang, val in langs.items():
+                        lang_bytes[lang] = lang_bytes.get(lang, 0) + val
+                except Exception as e:
+                    print(f"Warning: could not fetch languages for {r['name']}: {e}")
+                    
+        # 3. Fetch commits count
+        print("Fetching commits from search...")
+        commit_data = get_json(f"https://api.github.com/search/commits?q=author:{username}")
+        total_commits = commit_data.get("total_count", 0) if commit_data else 0
+        
+        # 4. Fetch PRs count
+        print("Fetching PRs from search...")
+        pr_data = get_json(f"https://api.github.com/search/issues?q=author:{username}+type:pr")
+        total_prs = pr_data.get("total_count", 0) if pr_data else 0
+        
+        # 5. Fetch Issues count
+        print("Fetching issues from search...")
+        issue_data = get_json(f"https://api.github.com/search/issues?q=author:{username}+type:issue")
+        total_issues = issue_data.get("total_count", 0) if issue_data else 0
+        
+        # 6. Fetch Contributed to count
+        print("Fetching contributions from search...")
+        contrib_data = get_json(f"https://api.github.com/search/issues?q=author:{username}+type:pr+-user:{username}")
+        contributed_repos = set()
+        if contrib_data and "items" in contrib_data:
+            for item in contrib_data["items"]:
+                repo_url = item.get("repository_url")
+                if repo_url:
+                    repo_name = repo_url.split("/repos/")[-1]
+                    contributed_repos.add(repo_name)
+        contributed_to = len(contributed_repos)
+        
+        # Format languages
+        total_bytes = sum(lang_bytes.values())
+        langs_list = []
+        if total_bytes > 0:
+            sorted_langs = sorted(lang_bytes.items(), key=lambda x: x[1], reverse=True)
+            color_map = {
+                "JavaScript": "#f1e05a",
+                "Python": "#3572A5",
+                "HTML": "#e34c26",
+                "TypeScript": "#3178c6",
+                "CSS": "#663399",
+                "Jupyter Notebook": "#DA5B0B",
+                "Rust": "#dea584",
+                "EJS": "#a91e50",
+                "Java": "#b07219",
+                "Dockerfile": "#384d54",
+                "Batchfile": "#C1F12E",
+                "C++": "#f34b7d",
+                "C": "#555555",
+                "C#": "#178600",
+                "Go": "#00ADD8",
+                "Ruby": "#701516",
+                "PHP": "#4F5D95",
+                "Shell": "#89e051",
+                "Kotlin": "#A97BFF",
+                "Swift": "#F05138",
+                "SQL": "#e38c00"
+            }
+            for name, val in sorted_langs:
+                pct = round((val / total_bytes) * 100, 2)
+                color = color_map.get(name, "#858585")
+                langs_list.append({
+                    "name": name,
+                    "percentage": pct,
+                    "color": color
+                })
+                
+        langs_list = langs_list[:10]
+        
+        return {
+            "stars": str(total_stars),
+            "commits": str(total_commits),
+            "prs": str(total_prs),
+            "issues": str(total_issues),
+            "contributions": str(contributed_to),
+            "followers": followers,
+            "languages": langs_list
+        }
+    except Exception as e:
+        print("Error fetching from direct GitHub API:", e)
+        return None
 
 def get_stats(username):
     url = f"https://github-readme-stats-eight-theta.vercel.app/api?username={username}&count_private=true&include_all_commits=true&v={int(datetime.now().timestamp())}"
@@ -208,7 +326,14 @@ def generate_svg(stats, streak, langs, filepath):
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
     
     width = 560
-    height = 550
+    
+    # Calculate dynamic height based on language count (2 columns)
+    rows = (len(langs) + 1) // 2
+    # Base height without legend = 385 (header/stats/streaks) + 75 (language title + progress bar) = 460
+    # Legend rows take rows * 24px, plus 15px margin
+    height = 460 + (rows * 24) + 15
+    if height < 550:
+        height = 550
     
     # Compute grade circle colors
     grade_color = "#70A5FD"
@@ -420,25 +545,47 @@ def generate_svg(stats, streak, langs, filepath):
 def main():
     username = "nigampalash"
     print(f"Fetching GitHub stats for user: {username}")
+    token = os.environ.get("GITHUB_TOKEN")
     
-    stats = get_stats(username)
-    if not stats:
-        print("Failed to fetch overall stats.")
-        sys.exit(1)
-        
-    print("Stats fetched:", stats)
+    # Try direct GitHub API first
+    github_stats = fetch_from_github_api(username, token)
+    
+    # Fetch from Vercel for fallback and for grade
+    print("Fetching Vercel stats card...")
+    vercel_stats = get_stats(username)
+    
+    stats = {}
+    if github_stats:
+        print("Successfully fetched stats from direct GitHub API.")
+        stats = github_stats
+        # Use grade from Vercel if available, otherwise default to A+
+        stats["grade"] = vercel_stats.get("grade", "A+") if vercel_stats else "A+"
+    else:
+        print("Falling back to Vercel API stats...")
+        if vercel_stats:
+            stats = vercel_stats
+            print("Fetching Vercel languages card...")
+            stats["languages"] = get_languages(username)
+        else:
+            print("Error: Both GitHub API and Vercel failed. Cannot proceed.")
+            sys.exit(1)
+            
+    print("Final stats calculated:")
+    print(" - Stars:", stats["stars"])
+    print(" - Commits:", stats["commits"])
+    print(" - PRs:", stats["prs"])
+    print(" - Issues:", stats["issues"])
+    print(" - Contributed to:", stats["contributions"])
+    print(" - Grade:", stats["grade"])
+    print(" - Languages count:", len(stats["languages"]))
     
     print("Fetching streak information...")
     streak = get_streaks(username)
     print("Streaks calculated:", streak)
     
-    print("Fetching programming languages...")
-    langs = get_languages(username)
-    print("Languages fetched:", len(langs))
-    
     # Target SVG file
     output_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets", "github_stats.svg")
-    generate_svg(stats, streak, langs, output_path)
+    generate_svg(stats, streak, stats["languages"], output_path)
     print("Done!")
 
 if __name__ == "__main__":
