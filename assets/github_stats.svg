@@ -57,7 +57,7 @@
             <!-- Commits -->
             <g transform="translate(0, 40)">
                 <text class="stat-label">Total Commits:</text>
-                <text x="180" class="stat-value">284</text>
+                <text x="180" class="stat-value">285</text>
             </g>
             <!-- PRs -->
             <g transform="translate(0, 70)">
@@ -133,14 +133,14 @@
         
         <!-- Progress Bar Segments -->
         <g clip-path="url(#bar-clip)">
-            <rect x="30" y="50" width="193.0" height="8" fill="#f1e05a" />
-<rect x="223.0" y="50" width="128.20000000000002" height="8" fill="#3572A5" />
-<rect x="351.20000000000005" y="50" width="46.25" height="8" fill="#e34c26" />
-<rect x="397.45000000000005" y="50" width="45.75" height="8" fill="#3178c6" />
-<rect x="443.20000000000005" y="50" width="38.15" height="8" fill="#663399" />
-<rect x="481.35" y="50" width="22.3" height="8" fill="#DA5B0B" />
-<rect x="503.65000000000003" y="50" width="21.45" height="8" fill="#dea584" />
-<rect x="525.1" y="50" width="4.8999999999999995" height="8" fill="#a91e50" />
+            <rect x="30" y="50" width="192.98070192980703" height="8" fill="#f1e05a" />
+<rect x="222.98070192980703" y="50" width="128.23717628237173" height="8" fill="#3572A5" />
+<rect x="351.2178782121788" y="50" width="46.24537546245375" height="8" fill="#e34c26" />
+<rect x="397.46325367463254" y="50" width="45.74542545745425" height="8" fill="#3178c6" />
+<rect x="443.2086791320868" y="50" width="38.146185381461855" height="8" fill="#663399" />
+<rect x="481.35486451354865" y="50" width="22.2977702229777" height="8" fill="#DA5B0B" />
+<rect x="503.65263473652635" y="50" width="21.44785521447855" height="8" fill="#dea584" />
+<rect x="525.1004899510049" y="50" width="4.8995100489951" height="8" fill="#a91e50" />
         </g>
         
         <!-- Clip Path to round progress bar edges -->
@@ -160,7 +160,7 @@
         <g transform="translate(275, 75)">
             <circle cx="5" cy="5" r="5" fill="#3572A5" />
             <text x="18" y="9" fill="#A9B1D6" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" font-weight="500">Python</text>
-            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">25.64%</text>
+            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">25.65%</text>
         </g>
         
 

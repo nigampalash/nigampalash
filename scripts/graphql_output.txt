@@ -1,0 +1,42 @@
+{
+  "data": {
+    "user": {
+      "c2023": {
+        "totalCommitContributions": 0,
+        "totalPullRequestContributions": 0,
+        "totalIssueContributions": 0,
+        "restrictedContributionsCount": 0,
+        "contributionCalendar": {
+          "totalContributions": 1
+        }
+      },
+      "c2024": {
+        "totalCommitContributions": 0,
+        "totalPullRequestContributions": 0,
+        "totalIssueContributions": 0,
+        "restrictedContributionsCount": 0,
+        "contributionCalendar": {
+          "totalContributions": 0
+        }
+      },
+      "c2025": {
+        "totalCommitContributions": 35,
+        "totalPullRequestContributions": 1,
+        "totalIssueContributions": 1,
+        "restrictedContributionsCount": 0,
+        "contributionCalendar": {
+          "totalContributions": 47
+        }
+      },
+      "c2026": {
+        "totalCommitContributions": 112,
+        "totalPullRequestContributions": 0,
+        "totalIssueContributions": 1,
+        "restrictedContributionsCount": 0,
+        "contributionCalendar": {
+          "totalContributions": 124
+        }
+      }
+    }
+  }
+}
