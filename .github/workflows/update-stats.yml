@@ -24,11 +24,6 @@ jobs:
           python-size: '3.10'
           python-version: '3.10'
 
-      - name: Run GraphQL Test
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python scripts/test_graphql.py
-
       - name: Run Stats Generator
         run: python scripts/generate_stats.py
 
@@ -36,5 +31,5 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/github_stats.svg scripts/graphql_output.txt
+          git add assets/github_stats.svg
           git diff-index --quiet HEAD || (git commit -m "auto: Update GitHub stats card" && git push)
