@@ -24,6 +24,11 @@ jobs:
           python-size: '3.10'
           python-version: '3.10'
 
+      - name: Run GraphQL Test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/test_graphql.py
+
       - name: Run Stats Generator
         run: python scripts/generate_stats.py
 
