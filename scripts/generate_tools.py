@@ -42,7 +42,7 @@ def generate_svg():
             ]
         },
         {
-            "title": "Backend & Databases",
+            "title": "Backend &amp; Databases",
             "x": 30,
             "y": 223,
             "icons": [
@@ -53,7 +53,7 @@ def generate_svg():
             ]
         },
         {
-            "title": "AI / ML & Tools",
+            "title": "AI / ML &amp; Tools",
             "x": 295,
             "y": 223,
             "icons": [
@@ -106,7 +106,7 @@ def generate_svg():
         <!-- Icon Container Box -->
         <rect x="{x_pos:.1f}" y="{icons_y}" width="{box_w}" height="{box_w}" class="icon-box" rx="8" />
         <!-- Base64 Devicon Image -->
-        <image href="{icon['data']}" x="{x_pos + 8:.1f}" y="{icons_y + 8}" width="26" height="26" />
+        <image xlink:href="{icon['data']}" x="{x_pos + 8:.1f}" y="{icons_y + 8}" width="26" height="26" />
     </g>""")
             
             # Rotate floating animation index from 1 to 6
@@ -114,7 +114,7 @@ def generate_svg():
             
     svg_body = "\n".join(content_svg)
     
-    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width}px" height="{height}px" viewBox="0 0 {width} {height}" direction="ltr">
+    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="{width}px" height="{height}px" viewBox="0 0 {width} {height}" direction="ltr">
     <style>
         @keyframes float-keyframes-1 {{
             0% {{ transform: translateY(0px); }}
