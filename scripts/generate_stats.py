@@ -122,6 +122,24 @@ def fetch_from_github_api(username, token=None):
         print("Error fetching from direct GitHub API:", e)
         return None
 
+def get_manual_commits():
+    try:
+        readme_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "README.md")
+        if os.path.exists(readme_path):
+            with open(readme_path, "r", encoding="utf-8") as f:
+                content = f.read()
+            # Match query param: github_stats.svg?commits=+100 or github_stats.svg?commits=450
+            match_param = re.search(r'github_stats\.svg\?(?:commits|manual_commits)=([+-]?\d+)', content)
+            if match_param:
+                return match_param.group(1)
+            # Match HTML comment: <!-- manual_commits: +100 --> or <!-- manual_commits: 450 -->
+            match_comment = re.search(r'<!--\s*(?:manual_commits|commits_override):\s*([+-]?\d+)\s*-->', content)
+            if match_comment:
+                return match_comment.group(1)
+    except Exception as e:
+        print("Error reading manual commits:", e)
+    return None
+
 def get_stats(username):
     url = f"https://github-readme-stats-eight-theta.vercel.app/api?username={username}&count_private=true&include_all_commits=true&v={int(datetime.now().timestamp())}"
     req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
@@ -569,6 +587,21 @@ def main():
         else:
             print("Error: Both GitHub API and Vercel failed. Cannot proceed.")
             sys.exit(1)
+            
+    # Apply manual commits override if present in README.md
+    manual_commits_val = get_manual_commits()
+    if manual_commits_val:
+        if manual_commits_val.startswith(("+", "-")):
+            try:
+                offset = int(manual_commits_val)
+                original = int(stats["commits"])
+                stats["commits"] = str(original + offset)
+                print(f"Applied relative commits offset {manual_commits_val} from README.md: {original} -> {stats['commits']}")
+            except Exception as e:
+                print("Error applying relative commits offset:", e)
+        else:
+            stats["commits"] = manual_commits_val
+            print(f"Applied absolute commits override {manual_commits_val} from README.md.")
             
     print("Final stats calculated:")
     print(" - Stars:", stats["stars"])

@@ -48,7 +48,7 @@ B.Tech Computer Science student at SRM Institute of Science and Technology, pass
 ## 📊 GitHub Stats
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/nigampalash/nigampalash/main/assets/github_stats.svg" alt="GitHub Stats" width="560" />
+  <img src="https://raw.githubusercontent.com/nigampalash/nigampalash/main/assets/github_stats.svg?commits=149" alt="GitHub Stats" width="560" />
 </p>
 
 
