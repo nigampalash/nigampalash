@@ -56,7 +56,30 @@ B.Tech Computer Science student at SRM Institute of Science and Technology, pass
   <img src="https://raw.githubusercontent.com/nigampalash/nigampalash/main/assets/github_stats.svg?commits=149" alt="GitHub Stats" width="560" />
 </p>
 
+---
 
+## 📊 GitHub Analytics
+
+<div align="center">
+<a href="https://github.com/nigampalash">
+  <img height="170px" src="https://github-readme-stats.vercel.app/api?username=nigampalash&show_icons=true&theme=github_dark&hide_border=true&bg_color=0D1117&title_color=58a6ff&icon_color=58a6ff&text_color=c9d1d9" />
+  <img height="170px" src="https://github-readme-stats.vercel.app/api/top-langs/?username=nigampalash&layout=compact&theme=github_dark&hide_border=true&bg_color=0D1117&title_color=58a6ff&text_color=c9d1d9&langs_count=8" />
+</a>
+</div>
+
+<div align="center">
+  <img src="https://streak-stats.demolab.com?user=nigampalash&theme=github-dark-blue&hide_border=true&background=0D1117&ring=58a6ff&fire=58a6ff&currStreakLabel=58a6ff&dates=c9d1d9" width="70%" />
+</div>
+
+---
+
+## 🏆 GitHub Trophies
+
+<div align="center">
+<img src="https://github-profile-trophy.vercel.app/?username=nigampalash&theme=radical&no-frame=true&no-bg=false&margin-w=6&row=1" width="100%"/>
+</div>
+
+---
 
 ## 🛠️ Languages & Tools
 

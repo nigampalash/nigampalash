@@ -1,0 +1,39 @@
+name: Generate Streak Stats
+
+on:
+  schedule:
+    - cron: '0 0 * * *'   # Runs daily at midnight UTC
+  workflow_dispatch:       # Allow manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Generate GitHub Streak Stats SVG
+
+    steps:
+      - name: Checkout output branch
+        uses: actions/checkout@v3
+        with:
+          ref: output
+
+      - name: Generate streak stats SVG
+        uses: DenverCoder1/github-readme-streak-stats@v2
+        with:
+          user: nigampalash
+          theme: github-dark-blue
+          hide_border: true
+          background: 0D1117
+          ring: 58a6ff
+          fire: 58a6ff
+          currStreakLabel: 58a6ff
+          dates: c9d1d9
+
+      - name: Commit and push streak stats
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add streak-stats.svg
+          git diff-index --quiet HEAD || (git commit -m "auto: Update streak stats SVG" && git push)
