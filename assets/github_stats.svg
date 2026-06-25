@@ -57,7 +57,7 @@
             <!-- Commits -->
             <g transform="translate(0, 40)">
                 <text class="stat-label">Total Commits:</text>
-                <text x="180" class="stat-value">213</text>
+                <text x="180" class="stat-value">214</text>
             </g>
             <!-- PRs -->
             <g transform="translate(0, 70)">
@@ -133,8 +133,8 @@
         
         <!-- Progress Bar Segments -->
         <g clip-path="url(#bar-clip)">
-            <rect x="30" y="50" width="184.69234617308655" height="8" fill="#3178c6" />
-<rect x="214.69234617308655" y="50" width="110.05502751375687" height="8" fill="#f1e05a" />
+            <rect x="30" y="50" width="184.64232116058028" height="8" fill="#3178c6" />
+<rect x="214.64232116058028" y="50" width="110.10505252626314" height="8" fill="#f1e05a" />
 <rect x="324.7473736868434" y="50" width="108.45422711355677" height="8" fill="#3572A5" />
 <rect x="433.2016008004002" y="50" width="39.86993496748374" height="8" fill="#663399" />
 <rect x="473.0715357678839" y="50" width="26.21310655327664" height="8" fill="#e34c26" />
@@ -155,14 +155,14 @@
         <g transform="translate(35, 75)">
             <circle cx="5" cy="5" r="5" fill="#3178c6" />
             <text x="18" y="9" fill="#A9B1D6" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" font-weight="500">TypeScript</text>
-            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">36.92%</text>
+            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">36.91%</text>
         </g>
         
 
         <g transform="translate(275, 75)">
             <circle cx="5" cy="5" r="5" fill="#f1e05a" />
             <text x="18" y="9" fill="#A9B1D6" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" font-weight="500">JavaScript</text>
-            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">22.0%</text>
+            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">22.01%</text>
         </g>
         
 
