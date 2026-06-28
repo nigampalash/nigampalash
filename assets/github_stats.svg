@@ -57,7 +57,7 @@
             <!-- Commits -->
             <g transform="translate(0, 40)">
                 <text class="stat-label">Total Commits:</text>
-                <text x="180" class="stat-value">243</text>
+                <text x="180" class="stat-value">282</text>
             </g>
             <!-- PRs -->
             <g transform="translate(0, 70)">
