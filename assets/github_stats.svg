@@ -57,7 +57,7 @@
             <!-- Commits -->
             <g transform="translate(0, 40)">
                 <text class="stat-label">Total Commits:</text>
-                <text x="180" class="stat-value">299</text>
+                <text x="180" class="stat-value">301</text>
             </g>
             <!-- PRs -->
             <g transform="translate(0, 70)">
@@ -101,11 +101,11 @@
             <!-- Number Circle -->
             <circle cx="0" cy="5" r="28" fill="none" stroke="#BF91F3" stroke-width="4.5" />
             <text x="0" y="15" fill="#BF91F3" stroke="none" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-weight="700" font-size="28px" text-anchor="middle" style="animation: currstreak 0.6s linear forwards">
-                1
+                2
             </text>
             
             <text x="0" y="55" fill="#BF91F3" stroke="none" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-weight="700" font-size="14px" text-anchor="middle">Current Streak</text>
-            <text x="0" y="75" fill="#38BDAE" stroke="none" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-weight="400" font-size="12px" text-anchor="middle">Jul 02 - Jul 02</text>
+            <text x="0" y="75" fill="#38BDAE" stroke="none" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-weight="400" font-size="12px" text-anchor="middle">Jul 02 - Jul 03</text>
         </g>
         
         <!-- Divider -->
@@ -133,16 +133,16 @@
         
         <!-- Progress Bar Segments -->
         <g clip-path="url(#bar-clip)">
-            <rect x="30" y="50" width="330.5322128851541" height="8" fill="#DA5B0B" />
-<rect x="360.5322128851541" y="50" width="61.52460984393758" height="8" fill="#3178c6" />
-<rect x="422.05682272909166" y="50" width="55.32212885154062" height="8" fill="#3572A5" />
-<rect x="477.3789515806323" y="50" width="30.11204481792717" height="8" fill="#f1e05a" />
-<rect x="507.49099639855945" y="50" width="9.75390156062425" height="8" fill="#663399" />
-<rect x="517.2448979591837" y="50" width="7.803121248499401" height="8" fill="#e34c26" />
-<rect x="525.0480192076832" y="50" width="3.1512605042016806" height="8" fill="#dea584" />
-<rect x="528.1992797118849" y="50" width="0.700280112044818" height="8" fill="#a91e50" />
-<rect x="528.8995598239296" y="50" width="0.700280112044818" height="8" fill="#b07219" />
-<rect x="529.5998399359744" y="50" width="0.4001600640256103" height="8" fill="#384d54" />
+            <rect x="30" y="50" width="330.24907472241676" height="8" fill="#DA5B0B" />
+<rect x="360.24907472241676" y="50" width="61.468440532159654" height="8" fill="#3178c6" />
+<rect x="421.7175152545764" y="50" width="55.31659497849356" height="8" fill="#3572A5" />
+<rect x="477.03411023307" y="50" width="30.109032709812947" height="8" fill="#f1e05a" />
+<rect x="507.14314294288295" y="50" width="9.702910873261981" height="8" fill="#663399" />
+<rect x="516.846053816145" y="50" width="7.802340702210664" height="8" fill="#e34c26" />
+<rect x="524.6483945183556" y="50" width="3.150945283585076" height="8" fill="#dea584" />
+<rect x="527.7993398019407" y="50" width="1.1003300990297091" height="8" fill="#a91e50" />
+<rect x="528.8996699009705" y="50" width="0.7002100630189059" height="8" fill="#b07219" />
+<rect x="529.5998799639893" y="50" width="0.4001200360108033" height="8" fill="#384d54" />
         </g>
         
         <!-- Clip Path to round progress bar edges -->
@@ -155,14 +155,14 @@
         <g transform="translate(35, 75)">
             <circle cx="5" cy="5" r="5" fill="#DA5B0B" />
             <text x="18" y="9" fill="#A9B1D6" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" font-weight="500">Jupyter Notebook</text>
-            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">66.08%</text>
+            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">66.03%</text>
         </g>
         
 
         <g transform="translate(275, 75)">
             <circle cx="5" cy="5" r="5" fill="#3178c6" />
             <text x="18" y="9" fill="#A9B1D6" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" font-weight="500">TypeScript</text>
-            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">12.3%</text>
+            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">12.29%</text>
         </g>
         
 
@@ -183,7 +183,7 @@
         <g transform="translate(35, 123)">
             <circle cx="5" cy="5" r="5" fill="#663399" />
             <text x="18" y="9" fill="#A9B1D6" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" font-weight="500">CSS</text>
-            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">1.95%</text>
+            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">1.94%</text>
         </g>
         
 
@@ -204,7 +204,7 @@
         <g transform="translate(275, 147)">
             <circle cx="5" cy="5" r="5" fill="#a91e50" />
             <text x="18" y="9" fill="#A9B1D6" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" font-weight="500">EJS</text>
-            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">0.14%</text>
+            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">0.22%</text>
         </g>
         
 
