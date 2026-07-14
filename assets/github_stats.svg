@@ -57,7 +57,7 @@
             <!-- Commits -->
             <g transform="translate(0, 40)">
                 <text class="stat-label">Total Commits:</text>
-                <text x="180" class="stat-value">320</text>
+                <text x="180" class="stat-value">337</text>
             </g>
             <!-- PRs -->
             <g transform="translate(0, 70)">
@@ -101,11 +101,11 @@
             <!-- Number Circle -->
             <circle cx="0" cy="5" r="28" fill="none" stroke="#BF91F3" stroke-width="4.5" />
             <text x="0" y="15" fill="#BF91F3" stroke="none" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-weight="700" font-size="28px" text-anchor="middle" style="animation: currstreak 0.6s linear forwards">
-                2
+                3
             </text>
             
             <text x="0" y="55" fill="#BF91F3" stroke="none" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-weight="700" font-size="14px" text-anchor="middle">Current Streak</text>
-            <text x="0" y="75" fill="#38BDAE" stroke="none" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-weight="400" font-size="12px" text-anchor="middle">Jul 12 - Jul 13</text>
+            <text x="0" y="75" fill="#38BDAE" stroke="none" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-weight="400" font-size="12px" text-anchor="middle">Jul 12 - Jul 14</text>
         </g>
         
         <!-- Divider -->
