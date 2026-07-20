@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="560px" height="571px" viewBox="0 0 560 571" direction="ltr">
+<svg xmlns="http://www.w3.org/2000/svg" width="560px" height="595px" viewBox="0 0 560 595" direction="ltr">
     <style>
         @keyframes currstreak {
             0% { font-size: 3px; opacity: 0.2; }
@@ -36,7 +36,7 @@
     </style>
     
     <!-- Outer Card Background -->
-    <rect class="card-border" width="558" height="569" x="1" y="1" />
+    <rect class="card-border" width="558" height="593" x="1" y="1" />
     
     <!-- HEADER -->
     <g transform="translate(30, 45)">
@@ -52,7 +52,7 @@
             <!-- Stars -->
             <g transform="translate(0, 10)">
                 <text class="stat-label">Total Stars:</text>
-                <text x="180" class="stat-value">39</text>
+                <text x="180" class="stat-value">35</text>
             </g>
             <!-- Commits -->
             <g transform="translate(0, 40)">
@@ -133,14 +133,16 @@
         
         <!-- Progress Bar Segments -->
         <g clip-path="url(#bar-clip)">
-            <rect x="30" y="50" width="296.45" height="8" fill="#DA5B0B" />
-<rect x="326.45" y="50" width="98.55" height="8" fill="#3178c6" />
-<rect x="425.0" y="50" width="56.150000000000006" height="8" fill="#3572A5" />
-<rect x="481.15" y="50" width="27.450000000000003" height="8" fill="#f1e05a" />
-<rect x="508.59999999999997" y="50" width="10.3" height="8" fill="#663399" />
-<rect x="518.9" y="50" width="7.3" height="8" fill="#e34c26" />
-<rect x="526.1999999999999" y="50" width="2.8499999999999996" height="8" fill="#dea584" />
-<rect x="529.05" y="50" width="0.95" height="8" fill="#a91e50" />
+            <rect x="30" y="50" width="295.8183273309324" height="8" fill="#DA5B0B" />
+<rect x="325.8183273309324" y="50" width="98.33933573429373" height="8" fill="#3178c6" />
+<rect x="424.15766306522613" y="50" width="56.022408963585434" height="8" fill="#3572A5" />
+<rect x="480.18007202881154" y="50" width="27.410964385754305" height="8" fill="#f1e05a" />
+<rect x="507.59103641456585" y="50" width="10.254101640656263" height="8" fill="#663399" />
+<rect x="517.8451380552222" y="50" width="7.252901160464186" height="8" fill="#e34c26" />
+<rect x="525.0980392156863" y="50" width="2.8511404561824727" height="8" fill="#dea584" />
+<rect x="527.9491796718688" y="50" width="0.9503801520608245" height="8" fill="#a91e50" />
+<rect x="528.8995598239296" y="50" width="0.6002400960384154" height="8" fill="#b07219" />
+<rect x="529.499799919968" y="50" width="0.5002000800320128" height="8" fill="#384d54" />
         </g>
         
         <!-- Clip Path to round progress bar edges -->
@@ -153,42 +155,42 @@
         <g transform="translate(35, 75)">
             <circle cx="5" cy="5" r="5" fill="#DA5B0B" />
             <text x="18" y="9" fill="#A9B1D6" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" font-weight="500">Jupyter Notebook</text>
-            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">59.29%</text>
+            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">59.14%</text>
         </g>
         
 
         <g transform="translate(275, 75)">
             <circle cx="5" cy="5" r="5" fill="#3178c6" />
             <text x="18" y="9" fill="#A9B1D6" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" font-weight="500">TypeScript</text>
-            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">19.71%</text>
+            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">19.66%</text>
         </g>
         
 
         <g transform="translate(35, 99)">
             <circle cx="5" cy="5" r="5" fill="#3572A5" />
             <text x="18" y="9" fill="#A9B1D6" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" font-weight="500">Python</text>
-            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">11.23%</text>
+            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">11.2%</text>
         </g>
         
 
         <g transform="translate(275, 99)">
             <circle cx="5" cy="5" r="5" fill="#f1e05a" />
             <text x="18" y="9" fill="#A9B1D6" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" font-weight="500">JavaScript</text>
-            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">5.49%</text>
+            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">5.48%</text>
         </g>
         
 
         <g transform="translate(35, 123)">
             <circle cx="5" cy="5" r="5" fill="#663399" />
             <text x="18" y="9" fill="#A9B1D6" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" font-weight="500">CSS</text>
-            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">2.06%</text>
+            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">2.05%</text>
         </g>
         
 
         <g transform="translate(275, 123)">
             <circle cx="5" cy="5" r="5" fill="#e34c26" />
             <text x="18" y="9" fill="#A9B1D6" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" font-weight="500">HTML</text>
-            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">1.46%</text>
+            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">1.45%</text>
         </g>
         
 
@@ -203,6 +205,20 @@
             <circle cx="5" cy="5" r="5" fill="#a91e50" />
             <text x="18" y="9" fill="#A9B1D6" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" font-weight="500">EJS</text>
             <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">0.19%</text>
+        </g>
+        
+
+        <g transform="translate(35, 171)">
+            <circle cx="5" cy="5" r="5" fill="#b07219" />
+            <text x="18" y="9" fill="#A9B1D6" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" font-weight="500">Java</text>
+            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">0.12%</text>
+        </g>
+        
+
+        <g transform="translate(275, 171)">
+            <circle cx="5" cy="5" r="5" fill="#384d54" />
+            <text x="18" y="9" fill="#A9B1D6" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" font-weight="500">Dockerfile</text>
+            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">0.1%</text>
         </g>
         
     </g>
