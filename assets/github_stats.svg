@@ -133,16 +133,16 @@
         
         <!-- Progress Bar Segments -->
         <g clip-path="url(#bar-clip)">
-            <rect x="30" y="50" width="295.8183273309324" height="8" fill="#DA5B0B" />
-<rect x="325.8183273309324" y="50" width="98.33933573429373" height="8" fill="#3178c6" />
-<rect x="424.15766306522613" y="50" width="56.022408963585434" height="8" fill="#3572A5" />
-<rect x="480.18007202881154" y="50" width="27.410964385754305" height="8" fill="#f1e05a" />
-<rect x="507.59103641456585" y="50" width="10.254101640656263" height="8" fill="#663399" />
-<rect x="517.8451380552222" y="50" width="7.252901160464186" height="8" fill="#e34c26" />
-<rect x="525.0980392156863" y="50" width="2.8511404561824727" height="8" fill="#dea584" />
-<rect x="527.9491796718688" y="50" width="0.9503801520608245" height="8" fill="#a91e50" />
-<rect x="528.8995598239296" y="50" width="0.6002400960384154" height="8" fill="#b07219" />
-<rect x="529.499799919968" y="50" width="0.5002000800320128" height="8" fill="#384d54" />
+            <rect x="30" y="50" width="295.78873662098636" height="8" fill="#DA5B0B" />
+<rect x="325.78873662098636" y="50" width="98.32949884965491" height="8" fill="#3178c6" />
+<rect x="424.11823547064125" y="50" width="56.06682004601382" height="8" fill="#3572A5" />
+<rect x="480.1850555166551" y="50" width="27.40822246674003" height="8" fill="#f1e05a" />
+<rect x="507.5932779833951" y="50" width="10.253075922776835" height="8" fill="#663399" />
+<rect x="517.846353906172" y="50" width="7.25217565269581" height="8" fill="#e34c26" />
+<rect x="525.0985295588678" y="50" width="2.8508552565769736" height="8" fill="#dea584" />
+<rect x="527.9493848154448" y="50" width="0.9502850855256579" height="8" fill="#a91e50" />
+<rect x="528.8996699009705" y="50" width="0.6001800540162049" height="8" fill="#b07219" />
+<rect x="529.4998499549866" y="50" width="0.5001500450135042" height="8" fill="#384d54" />
         </g>
         
         <!-- Clip Path to round progress bar edges -->
@@ -169,7 +169,7 @@
         <g transform="translate(35, 99)">
             <circle cx="5" cy="5" r="5" fill="#3572A5" />
             <text x="18" y="9" fill="#A9B1D6" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" font-weight="500">Python</text>
-            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">11.2%</text>
+            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">11.21%</text>
         </g>
         
 
