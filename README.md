@@ -10,7 +10,7 @@
   </a>
 </p>
 
-<img src="https://raw.githubusercontent.com/nigampalash/nigampalash/main/assets/apartment_decor.gif" alt="Cover Banner" width="100%" />
+<img src="assets/apartment_decor.gif" alt="Cover Banner" width="100%" />
 
 
 
@@ -49,27 +49,19 @@ B.Tech Computer Science student at SRM Institute of Science and Technology, pass
 - <img src="assets/icons/bullet_achievement.svg" width="18" valign="middle" /> **Full Stack Architect** — *Experience designing end-to-end web applications.*
 - <img src="assets/icons/bullet_achievement.svg" width="18" valign="middle" /> **Java Specialist** — *Deep understanding of OOPs, collections, and algorithms in Java.*
 
+<!-- manual_commits: 149 -->
+## 📊 GitHub Stats
 
-
-## 📊 GitHub Analytics
-
-<div align="center">
-<a href="https://github.com/nigampalash">
-  <img height="170px" src="https://github-readme-stats.vercel.app/api?username=nigampalash&show_icons=true&theme=github_dark&hide_border=true&bg_color=0D1117&title_color=58a6ff&icon_color=58a6ff&text_color=c9d1d9&count_private=true&include_all_commits=true" />
-  <img height="170px" src="https://github-readme-stats.vercel.app/api/top-langs/?username=nigampalash&layout=compact&theme=github_dark&hide_border=true&bg_color=0D1117&title_color=58a6ff&text_color=c9d1d9&langs_count=8" />
-</a>
-</div>
-
-<div align="center">
-  <img src="https://streak-stats.demolab.com?user=nigampalash&theme=github-dark-blue&hide_border=true&background=0D1117&ring=58a6ff&fire=58a6ff&currStreakLabel=58a6ff&dates=c9d1d9" width="70%" />
-</div>
+<p align="center">
+  <img src="assets/github_stats.svg" alt="GitHub Stats" width="560" />
+</p>
 
 ---
 
 ## 🛠️ Languages & Tools
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/nigampalash/nigampalash/main/assets/languages_tools.svg" alt="Languages & Tools" width="560" />
+  <img src="assets/languages_tools.svg" alt="Languages & Tools" width="560" />
 </p>
 
 ## 🤝 Connect with Me

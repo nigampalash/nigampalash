@@ -6,59 +6,93 @@ import json
 from datetime import datetime, timedelta, timezone
 
 def fetch_from_github_api(username, token=None):
-    headers = {'User-Agent': 'Mozilla/5.0'}
-    if token:
-        headers['Authorization'] = f"Bearer {token}"
+    base_headers = {
+        'User-Agent': 'Mozilla/5.0',
+        'Accept': 'application/vnd.github.v3+json, application/vnd.github.cloak-preview+json'
+    }
         
-    def get_json(url):
-        req = urllib.request.Request(url, headers=headers)
-        with urllib.request.urlopen(req) as resp:
-            return json.loads(resp.read().decode('utf-8'))
+    def get_json(url, use_token=True):
+        req_headers = dict(base_headers)
+        if use_token and token:
+            if token.startswith("Bearer ") or token.startswith("token "):
+                req_headers['Authorization'] = token
+            else:
+                req_headers['Authorization'] = f"token {token}"
+        req = urllib.request.Request(url, headers=req_headers)
+        try:
+            with urllib.request.urlopen(req) as resp:
+                return json.loads(resp.read().decode('utf-8'))
+        except urllib.error.HTTPError as e:
+            if e.code == 401 and use_token and token:
+                return get_json(url, use_token=False)
+            raise e
             
+    followers = 0
+    total_stars = 0
+    lang_bytes = {}
+    total_commits = 0
+    total_prs = 0
+    total_issues = 0
+    contributed_to = 0
+
+    # 1. Fetch user profile
     try:
-        # 1. Fetch user profile for followers
         print("Fetching user profile...")
         user_info = get_json(f"https://api.github.com/users/{username}")
-        followers = user_info.get("followers", 0) if user_info else 0
-        
-        # 2. Fetch repos for stars and languages
+        if user_info:
+            followers = user_info.get("followers", 0)
+    except Exception as e:
+        print("Warning: Could not fetch user profile:", e)
+
+    # 2. Fetch repos
+    try:
         print("Fetching repositories...")
         repos = get_json(f"https://api.github.com/users/{username}/repos?per_page=100")
-        total_stars = 0
-        lang_bytes = {}
-        
-        # We will get languages for each non-fork repository
-        for r in repos:
-            if r.get("fork"):
-                continue
-            total_stars += r.get("stargazers_count", 0)
-            
-            # Fetch language details
-            lang_url = r.get("languages_url")
-            if lang_url:
-                try:
-                    langs = get_json(lang_url)
-                    for lang, val in langs.items():
-                        lang_bytes[lang] = lang_bytes.get(lang, 0) + val
-                except Exception as e:
-                    print(f"Warning: could not fetch languages for {r['name']}: {e}")
-                    
-        # 3. Fetch commits count
+        if repos and isinstance(repos, list):
+            for r in repos:
+                if r.get("fork"):
+                    continue
+                total_stars += r.get("stargazers_count", 0)
+                lang_url = r.get("languages_url")
+                if lang_url:
+                    try:
+                        langs = get_json(lang_url)
+                        for lang, val in langs.items():
+                            lang_bytes[lang] = lang_bytes.get(lang, 0) + val
+                    except Exception as e:
+                        print(f"Warning: could not fetch languages for {r.get('name')}: {e}")
+    except Exception as e:
+        print("Warning: Could not fetch repositories:", e)
+
+    # 3. Fetch commits count
+    try:
         print("Fetching commits from search...")
         commit_data = get_json(f"https://api.github.com/search/commits?q=author:{username}")
-        total_commits = commit_data.get("total_count", 0) if commit_data else 0
-        
-        # 4. Fetch PRs count
+        if commit_data:
+            total_commits = commit_data.get("total_count", 0)
+    except Exception as e:
+        print("Warning: Could not fetch commits from search API:", e)
+
+    # 4. Fetch PRs count
+    try:
         print("Fetching PRs from search...")
         pr_data = get_json(f"https://api.github.com/search/issues?q=author:{username}+type:pr")
-        total_prs = pr_data.get("total_count", 0) if pr_data else 0
-        
-        # 5. Fetch Issues count
+        if pr_data:
+            total_prs = pr_data.get("total_count", 0)
+    except Exception as e:
+        print("Warning: Could not fetch PRs from search API:", e)
+
+    # 5. Fetch Issues count
+    try:
         print("Fetching issues from search...")
         issue_data = get_json(f"https://api.github.com/search/issues?q=author:{username}+type:issue")
-        total_issues = issue_data.get("total_count", 0) if issue_data else 0
-        
-        # 6. Fetch Contributed to count
+        if issue_data:
+            total_issues = issue_data.get("total_count", 0)
+    except Exception as e:
+        print("Warning: Could not fetch issues from search API:", e)
+
+    # 6. Fetch Contributed to count
+    try:
         print("Fetching contributions from search...")
         contrib_data = get_json(f"https://api.github.com/search/issues?q=author:{username}+type:pr+-user:{username}")
         contributed_repos = set()
@@ -69,58 +103,56 @@ def fetch_from_github_api(username, token=None):
                     repo_name = repo_url.split("/repos/")[-1]
                     contributed_repos.add(repo_name)
         contributed_to = len(contributed_repos)
-        
-        # Format languages
-        total_bytes = sum(lang_bytes.values())
-        langs_list = []
-        if total_bytes > 0:
-            sorted_langs = sorted(lang_bytes.items(), key=lambda x: x[1], reverse=True)
-            color_map = {
-                "JavaScript": "#f1e05a",
-                "Python": "#3572A5",
-                "HTML": "#e34c26",
-                "TypeScript": "#3178c6",
-                "CSS": "#663399",
-                "Jupyter Notebook": "#DA5B0B",
-                "Rust": "#dea584",
-                "EJS": "#a91e50",
-                "Java": "#b07219",
-                "Dockerfile": "#384d54",
-                "Batchfile": "#C1F12E",
-                "C++": "#f34b7d",
-                "C": "#555555",
-                "C#": "#178600",
-                "Go": "#00ADD8",
-                "Ruby": "#701516",
-                "PHP": "#4F5D95",
-                "Shell": "#89e051",
-                "Kotlin": "#A97BFF",
-                "Swift": "#F05138",
-                "SQL": "#e38c00"
-            }
-            for name, val in sorted_langs:
-                pct = round((val / total_bytes) * 100, 2)
-                color = color_map.get(name, "#858585")
-                langs_list.append({
-                    "name": name,
-                    "percentage": pct,
-                    "color": color
-                })
-                
-        langs_list = langs_list[:10]
-        
-        return {
-            "stars": str(total_stars),
-            "commits": str(total_commits),
-            "prs": str(total_prs),
-            "issues": str(total_issues),
-            "contributions": str(contributed_to),
-            "followers": followers,
-            "languages": langs_list
-        }
     except Exception as e:
-        print("Error fetching from direct GitHub API:", e)
-        return None
+        print("Warning: Could not fetch contributions from search API:", e)
+
+    # Format languages
+    total_bytes = sum(lang_bytes.values())
+    langs_list = []
+    if total_bytes > 0:
+        sorted_langs = sorted(lang_bytes.items(), key=lambda x: x[1], reverse=True)
+        color_map = {
+            "JavaScript": "#f1e05a",
+            "Python": "#3572A5",
+            "HTML": "#e34c26",
+            "TypeScript": "#3178c6",
+            "CSS": "#663399",
+            "Jupyter Notebook": "#DA5B0B",
+            "Rust": "#dea584",
+            "EJS": "#a91e50",
+            "Java": "#b07219",
+            "Dockerfile": "#384d54",
+            "Batchfile": "#C1F12E",
+            "C++": "#f34b7d",
+            "C": "#555555",
+            "C#": "#178600",
+            "Go": "#00ADD8",
+            "Ruby": "#701516",
+            "PHP": "#4F5D95",
+            "Shell": "#89e051",
+            "Kotlin": "#A97BFF",
+            "Swift": "#F05138",
+            "SQL": "#e38c00"
+        }
+        for name, val in sorted_langs:
+            pct = round((val / total_bytes) * 100, 2)
+            color = color_map.get(name, "#858585")
+            langs_list.append({
+                "name": name,
+                "percentage": pct,
+                "color": color
+            })
+    langs_list = langs_list[:10]
+
+    return {
+        "stars": str(total_stars),
+        "commits": str(total_commits),
+        "prs": str(total_prs),
+        "issues": str(total_issues),
+        "contributions": str(contributed_to),
+        "followers": followers,
+        "languages": langs_list
+    }
 
 def get_manual_commits():
     try:
@@ -128,14 +160,14 @@ def get_manual_commits():
         if os.path.exists(readme_path):
             with open(readme_path, "r", encoding="utf-8") as f:
                 content = f.read()
+            # Match HTML comment: <!-- manual_commits: +100 --> or <!-- manual_commits: 149 -->
+            match_comment = re.search(r'<!--\s*(?:manual_commits|commits_override|commits):\s*([+-]?\d+)\s*-->', content)
+            if match_comment:
+                return match_comment.group(1)
             # Match query param: github_stats.svg?commits=+100 or github_stats.svg?commits=450
             match_param = re.search(r'github_stats\.svg\?(?:commits|manual_commits)=([+-]?\d+)', content)
             if match_param:
                 return match_param.group(1)
-            # Match HTML comment: <!-- manual_commits: +100 --> or <!-- manual_commits: 450 -->
-            match_comment = re.search(r'<!--\s*(?:manual_commits|commits_override):\s*([+-]?\d+)\s*-->', content)
-            if match_comment:
-                return match_comment.group(1)
     except Exception as e:
         print("Error reading manual commits:", e)
     return None
@@ -568,25 +600,36 @@ def main():
     # Try direct GitHub API first
     github_stats = fetch_from_github_api(username, token)
     
-    # Fetch from Vercel for fallback and for grade
+    # Fetch from Vercel as secondary source / fallback
     print("Fetching Vercel stats card...")
     vercel_stats = get_stats(username)
     
-    stats = {}
+    stats = {
+        "stars": "0",
+        "commits": "0",
+        "prs": "0",
+        "issues": "0",
+        "contributions": "0",
+        "grade": "A+",
+        "languages": []
+    }
+    
+    if vercel_stats:
+        stats.update(vercel_stats)
+        vercel_langs = get_languages(username)
+        if vercel_langs:
+            stats["languages"] = vercel_langs
+            
     if github_stats:
-        print("Successfully fetched stats from direct GitHub API.")
-        stats = github_stats
-        # Use grade from Vercel if available, otherwise default to A+
-        stats["grade"] = vercel_stats.get("grade", "A+") if vercel_stats else "A+"
-    else:
-        print("Falling back to Vercel API stats...")
-        if vercel_stats:
-            stats = vercel_stats
-            print("Fetching Vercel languages card...")
-            stats["languages"] = get_languages(username)
-        else:
-            print("Error: Both GitHub API and Vercel failed. Cannot proceed.")
-            sys.exit(1)
+        print("Merging direct GitHub API stats...")
+        for k in ["stars", "commits", "prs", "issues", "contributions"]:
+            val = github_stats.get(k)
+            if val and val != "0":
+                stats[k] = val
+        if github_stats.get("languages") and len(github_stats["languages"]) > 0:
+            stats["languages"] = github_stats["languages"]
+        if github_stats.get("grade"):
+            stats["grade"] = github_stats["grade"]
             
     # Apply manual commits override if present in README.md
     manual_commits_val = get_manual_commits()
