@@ -49,6 +49,8 @@ B.Tech Computer Science student at SRM Institute of Science and Technology, pass
 - <img src="assets/icons/bullet_achievement.svg" width="18" valign="middle" /> **Full Stack Architect** — *Experience designing end-to-end web applications.*
 - <img src="assets/icons/bullet_achievement.svg" width="18" valign="middle" /> **Java Specialist** — *Deep understanding of OOPs, collections, and algorithms in Java.*
 
+<!-- manual_commits: 401 -->
+<!-- manual_stars: 48 -->
 ## 📊 GitHub Stats
 
 <p align="center">

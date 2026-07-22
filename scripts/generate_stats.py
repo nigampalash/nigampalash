@@ -256,6 +256,26 @@ def get_manual_commits():
     return None
 
 
+def get_manual_stars():
+    """Read an optional manual_stars floor value from README.md."""
+    try:
+        readme_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "README.md"
+        )
+        if os.path.exists(readme_path):
+            with open(readme_path, "r", encoding="utf-8") as f:
+                content = f.read()
+            match = re.search(
+                r'<!--\s*(?:manual_stars|stars_floor|stars):\s*(\d+)\s*-->',
+                content
+            )
+            if match:
+                return match.group(1)
+    except Exception as e:
+        print("Error reading manual stars:", e)
+    return None
+
+
 def get_streaks(username):
     """Scrape GitHub contribution graph to calculate current/longest streaks."""
     contributions = {}
@@ -595,7 +615,48 @@ def main():
         if github_stats.get("languages"):
             stats["languages"] = github_stats["languages"]
 
-    # Compute grade from real data
+    # ── Manual commits floor from README ──────────────────────────────────
+    # Format in README.md:  <!-- manual_commits: 401 -->
+    # The README value is a FLOOR — if the API counts MORE, the API wins.
+    # Use a leading '+' to add to the API count instead: <!-- manual_commits: +50 -->
+    manual_commits = get_manual_commits()
+    if manual_commits:
+        if manual_commits.startswith(("+", "-")):
+            try:
+                original = int(stats["commits"])
+                stats["commits"] = str(original + int(manual_commits))
+                print(f"Applied relative commits offset {manual_commits}: {original} -> {stats['commits']}")
+            except Exception as e:
+                print("Error applying commits offset:", e)
+        else:
+            # Treat as a floor: use whichever is LARGER (API or manual)
+            try:
+                api_val = int(stats["commits"])
+                floor_val = int(manual_commits)
+                if floor_val > api_val:
+                    stats["commits"] = manual_commits
+                    print(f"API returned {api_val} commits — using manual floor {floor_val}")
+                else:
+                    print(f"API returned {api_val} commits — above floor {floor_val}, keeping API value")
+            except Exception as e:
+                print("Error applying commits floor:", e)
+
+    # ── Manual stars floor from README ────────────────────────────────────
+    # Format in README.md:  <!-- manual_stars: 48 -->
+    manual_stars = get_manual_stars()
+    if manual_stars:
+        try:
+            api_val = int(stats["stars"])
+            floor_val = int(manual_stars)
+            if floor_val > api_val:
+                stats["stars"] = manual_stars
+                print(f"API returned {api_val} stars — using manual floor {floor_val}")
+            else:
+                print(f"API returned {api_val} stars — above floor {floor_val}, keeping API value")
+        except Exception as e:
+            print("Error applying stars floor:", e)
+
+    # Compute grade from final (floor-adjusted) stats
     try:
         stats["grade"] = compute_grade(
             int(stats["stars"]),
@@ -606,23 +667,6 @@ def main():
     except Exception as e:
         print("Warning: Could not compute grade:", e)
         stats["grade"] = "A+"
-
-    # Manual override only if API returned 0 commits (total rate-limited)
-    manual = get_manual_commits()
-    if manual:
-        if manual.startswith(("+", "-")):
-            try:
-                original = int(stats["commits"])
-                stats["commits"] = str(original + int(manual))
-                print(f"Applied relative offset {manual}: {original} -> {stats['commits']}")
-            except Exception as e:
-                print("Error applying offset:", e)
-        else:
-            if stats["commits"] == "0":
-                stats["commits"] = manual
-                print(f"API returned 0 — using manual fallback: {manual}")
-            else:
-                print(f"API returned {stats['commits']} commits — ignoring manual override {manual}")
 
     print("\nFinal stats:")
     for k in ["stars", "commits", "prs", "issues", "contributions", "grade"]:
