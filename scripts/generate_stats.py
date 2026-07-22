@@ -114,37 +114,44 @@ def fetch_from_github_api(username, token=None):
     except Exception as e:
         print("Warning: Could not fetch repositories:", e)
 
-    # ── 3. Stars & Languages (from own non-fork repos) ────────────────────
+    # ── 3. Stars — count from ALL repos (including forks) ───────────────────
+    # GitHub profile shows stars on ALL your repos, including forks.
     total_stars = 0
     lang_bytes = {}
     own_repos = [r for r in repos if not r.get("fork")]
-    print(f"Processing {len(own_repos)} own (non-fork) repositories...")
+    print(f"Processing {len(repos)} total repositories ({len(own_repos)} own, {len(repos)-len(own_repos)} forks)...")
 
-    for r in own_repos:
+    for r in repos:
+        # Stars: count from every repo (own + forks)
         total_stars += r.get("stargazers_count", 0)
-        lang_url = r.get("languages_url")
-        if lang_url:
-            try:
-                langs, _ = get_json(lang_url)
-                if isinstance(langs, dict):
-                    for lang, val in langs.items():
-                        lang_bytes[lang] = lang_bytes.get(lang, 0) + val
-            except Exception as e:
-                print(f"  Warning: could not fetch languages for {r.get('name')}: {e}")
 
-    print(f"Total stars: {total_stars}")
+        # Languages: only from own repos (more meaningful)
+        if not r.get("fork"):
+            lang_url = r.get("languages_url")
+            if lang_url:
+                try:
+                    langs, _ = get_json(lang_url)
+                    if isinstance(langs, dict):
+                        for lang, val in langs.items():
+                            lang_bytes[lang] = lang_bytes.get(lang, 0) + val
+                except Exception as e:
+                    print(f"  Warning: could not fetch languages for {r.get('name')}: {e}")
 
-    # ── 4. Commit counts (per-repo pagination trick) ───────────────────────
+    print(f"Total stars (own + forks): {total_stars}")
+
+    # ── 4. Commit counts — count from ALL repos (including forks) ────────────
+    # User may have commits in forked repos (e.g. contributions to open-source).
+    # We filter by author=username so we only count the user's own commits.
     print("Counting commits per repository (using pagination Link header)...")
     total_commits = 0
-    for r in own_repos:
+    for r in repos:
         repo_name = r.get("name", "")
         if not repo_name:
             continue
         count = count_commits_in_repo(username, repo_name, author=username)
-        print(f"  {repo_name}: {count} commits")
+        print(f"  {'[fork] ' if r.get('fork') else ''}{repo_name}: {count} commits")
         total_commits += count
-    print(f"Total commits across all own repos: {total_commits}")
+    print(f"Total commits across all repos (own + forks): {total_commits}")
 
     # ── 5. PRs ────────────────────────────────────────────────────────────
     total_prs = 0
