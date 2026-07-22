@@ -21,12 +21,67 @@ def fetch_from_github_api(username, token=None):
         req = urllib.request.Request(url, headers=req_headers)
         try:
             with urllib.request.urlopen(req) as resp:
-                return json.loads(resp.read().decode('utf-8'))
+                return json.loads(resp.read().decode('utf-8')), resp.headers
         except urllib.error.HTTPError as e:
             if e.code == 401 and use_token and token:
                 return get_json(url, use_token=False)
             raise e
-            
+
+    def get_json_data(url, use_token=True):
+        data, _ = get_json(url, use_token)
+        return data
+
+    def parse_last_page(link_header):
+        """Parse the last page number from a GitHub Link header."""
+        if not link_header:
+            return None
+        # Link: <https://api.github.com/...&page=5>; rel="last"
+        match = re.search(r'[<;,\s]page=(\d+)>;\s*rel=["\']last["\']', link_header)
+        if match:
+            return int(match.group(1))
+        return None
+
+    def count_commits_for_repo(owner, repo_name, author=None):
+        """
+        Use the GitHub API pagination trick: fetch 1 commit per page
+        and read the last page number from the Link header.
+        Returns the total commit count for the repo (optionally filtered by author).
+        """
+        if author:
+            url = f"https://api.github.com/repos/{owner}/{repo_name}/commits?author={author}&per_page=1"
+        else:
+            url = f"https://api.github.com/repos/{owner}/{repo_name}/commits?per_page=1"
+        
+        req_headers = dict(base_headers)
+        if token:
+            if token.startswith("Bearer ") or token.startswith("token "):
+                req_headers['Authorization'] = token
+            else:
+                req_headers['Authorization'] = f"token {token}"
+        
+        req = urllib.request.Request(url, headers=req_headers)
+        try:
+            with urllib.request.urlopen(req) as resp:
+                link_header = resp.headers.get('Link', '')
+                data = json.loads(resp.read().decode('utf-8'))
+                
+                last_page = parse_last_page(link_header)
+                if last_page is not None:
+                    return last_page
+                elif isinstance(data, list):
+                    return len(data)
+                else:
+                    return 0
+        except urllib.error.HTTPError as e:
+            if e.code == 409:
+                # Empty repo (no commits)
+                return 0
+            print(f"  Warning: HTTP {e.code} for {owner}/{repo_name}: {e.reason}")
+            return 0
+        except Exception as e:
+            print(f"  Warning: Error counting commits for {owner}/{repo_name}: {e}")
+            return 0
+
     followers = 0
     total_stars = 0
     lang_bytes = {}
@@ -38,45 +93,74 @@ def fetch_from_github_api(username, token=None):
     # 1. Fetch user profile
     try:
         print("Fetching user profile...")
-        user_info = get_json(f"https://api.github.com/users/{username}")
+        user_info = get_json_data(f"https://api.github.com/users/{username}")
         if user_info:
             followers = user_info.get("followers", 0)
     except Exception as e:
         print("Warning: Could not fetch user profile:", e)
 
     # 2. Fetch repos
+    repos = []
     try:
         print("Fetching repositories...")
-        repos = get_json(f"https://api.github.com/users/{username}/repos?per_page=100")
-        if repos and isinstance(repos, list):
-            for r in repos:
-                if r.get("fork"):
-                    continue
-                total_stars += r.get("stargazers_count", 0)
-                lang_url = r.get("languages_url")
-                if lang_url:
-                    try:
-                        langs = get_json(lang_url)
-                        for lang, val in langs.items():
-                            lang_bytes[lang] = lang_bytes.get(lang, 0) + val
-                    except Exception as e:
-                        print(f"Warning: could not fetch languages for {r.get('name')}: {e}")
+        page = 1
+        while True:
+            page_repos = get_json_data(f"https://api.github.com/user/repos?per_page=100&page={page}&affiliation=owner")
+            if not page_repos or not isinstance(page_repos, list):
+                break
+            repos.extend(page_repos)
+            if len(page_repos) < 100:
+                break
+            page += 1
+            
+        # Fallback to public repos if authenticated endpoint fails
+        if not repos:
+            page = 1
+            while True:
+                page_repos = get_json_data(f"https://api.github.com/users/{username}/repos?per_page=100&page={page}")
+                if not page_repos or not isinstance(page_repos, list):
+                    break
+                repos.extend(page_repos)
+                if len(page_repos) < 100:
+                    break
+                page += 1
+                
+        print(f"Found {len(repos)} repositories.")
+        
+        for r in repos:
+            if r.get("fork"):
+                continue
+            total_stars += r.get("stargazers_count", 0)
+            lang_url = r.get("languages_url")
+            if lang_url:
+                try:
+                    langs = get_json_data(lang_url)
+                    for lang, val in langs.items():
+                        lang_bytes[lang] = lang_bytes.get(lang, 0) + val
+                except Exception as e:
+                    print(f"Warning: could not fetch languages for {r.get('name')}: {e}")
     except Exception as e:
         print("Warning: Could not fetch repositories:", e)
 
-    # 3. Fetch commits count
-    try:
-        print("Fetching commits from search...")
-        commit_data = get_json(f"https://api.github.com/search/commits?q=author:{username}")
-        if commit_data:
-            total_commits = commit_data.get("total_count", 0)
-    except Exception as e:
-        print("Warning: Could not fetch commits from search API:", e)
+    # 3. Count commits across ALL own repos (not forks)
+    # This is the most accurate approach: iterate every non-fork repo,
+    # count commits authored by the user using the Link header trick
+    print("Counting commits across all repositories (this is the most accurate method)...")
+    own_repos = [r for r in repos if not r.get("fork")]
+    for r in own_repos:
+        repo_name = r.get("name", "")
+        if not repo_name:
+            continue
+        count = count_commits_for_repo(username, repo_name, author=username)
+        print(f"  {repo_name}: {count} commits by {username}")
+        total_commits += count
+
+    print(f"Total commits counted from all own repos: {total_commits}")
 
     # 4. Fetch PRs count
     try:
         print("Fetching PRs from search...")
-        pr_data = get_json(f"https://api.github.com/search/issues?q=author:{username}+type:pr")
+        pr_data = get_json_data(f"https://api.github.com/search/issues?q=author:{username}+type:pr")
         if pr_data:
             total_prs = pr_data.get("total_count", 0)
     except Exception as e:
@@ -85,7 +169,7 @@ def fetch_from_github_api(username, token=None):
     # 5. Fetch Issues count
     try:
         print("Fetching issues from search...")
-        issue_data = get_json(f"https://api.github.com/search/issues?q=author:{username}+type:issue")
+        issue_data = get_json_data(f"https://api.github.com/search/issues?q=author:{username}+type:issue")
         if issue_data:
             total_issues = issue_data.get("total_count", 0)
     except Exception as e:
@@ -94,7 +178,7 @@ def fetch_from_github_api(username, token=None):
     # 6. Fetch Contributed to count
     try:
         print("Fetching contributions from search...")
-        contrib_data = get_json(f"https://api.github.com/search/issues?q=author:{username}+type:pr+-user:{username}")
+        contrib_data = get_json_data(f"https://api.github.com/search/issues?q=author:{username}+type:pr+-user:{username}")
         contributed_repos = set()
         if contrib_data and "items" in contrib_data:
             for item in contrib_data["items"]:
@@ -171,52 +255,6 @@ def get_manual_commits():
     except Exception as e:
         print("Error reading manual commits:", e)
     return None
-
-def get_stats(username):
-    url = f"https://github-readme-stats-eight-theta.vercel.app/api?username={username}&count_private=true&include_all_commits=true&v={int(datetime.now().timestamp())}"
-    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-    try:
-        with urllib.request.urlopen(req) as response:
-            content = response.read().decode('utf-8')
-        
-        texts = re.findall(r'<text[^>]*>([^<]+)</text>', content)
-        texts_clean = [t.strip() for t in texts]
-        
-        stats = {
-            "stars": "0",
-            "commits": "0",
-            "prs": "0",
-            "issues": "0",
-            "contributions": "0",
-            "grade": "A+"
-        }
-        
-        # Parse fields based on text layout
-        try:
-            if "Total Stars:" in texts_clean:
-                idx = texts_clean.index("Total Stars:")
-                stats["stars"] = texts_clean[idx + 1]
-                if idx > 0:
-                    stats["grade"] = texts_clean[idx - 1]
-            if "Total Commits:" in texts_clean:
-                idx = texts_clean.index("Total Commits:")
-                stats["commits"] = texts_clean[idx + 1]
-            if "Total PRs:" in texts_clean:
-                idx = texts_clean.index("Total PRs:")
-                stats["prs"] = texts_clean[idx + 1]
-            if "Total Issues:" in texts_clean:
-                idx = texts_clean.index("Total Issues:")
-                stats["issues"] = texts_clean[idx + 1]
-            if "Contributed to:" in texts_clean:
-                idx = texts_clean.index("Contributed to:")
-                stats["contributions"] = texts_clean[idx + 1]
-        except Exception as e:
-            print("Warning parsing stats lists:", e)
-            
-        return stats
-    except Exception as e:
-        print("Error fetching stats card:", e)
-        return None
 
 def get_streaks(username):
     contributions = {}
@@ -336,40 +374,30 @@ def get_streaks(username):
         "longest_range": f"{format_date(longest_streak_start)} - {format_date(longest_streak_end)}" if longest_streak > 0 else "No streak recorded"
     }
 
-def get_languages(username):
-    url = f"https://github-readme-stats-eight-theta.vercel.app/api/top-langs/?username={username}&langs_count=8&layout=compact&theme=tokyonight&border_radius=10&count_private=true&v={int(datetime.now().timestamp())}"
-    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-    try:
-        with urllib.request.urlopen(req) as response:
-            content = response.read().decode('utf-8')
-            
-        texts = re.findall(r'<text[^>]*>([^<]+)</text>', content)
-        texts_clean = [t.strip() for t in texts]
-        
-        # Find all circles with fill attributes
-        circles = re.findall(r'<circle[^>]*fill="([^"]+)"[^>]*>', content)
-        
-        langs = []
-        lang_idx = 0
-        for t in texts_clean:
-            # Match JavaScript (39.21%)
-            match = re.match(r'([^)]+) \(([^%]+)%\)', t)
-            if match:
-                name = match.group(1).strip()
-                percentage = float(match.group(2).strip())
-                color = "#858585" # fallback gray
-                if lang_idx < len(circles):
-                    color = circles[lang_idx]
-                langs.append({
-                    "name": name,
-                    "percentage": percentage,
-                    "color": color
-                })
-                lang_idx += 1
-        return langs
-    except Exception as e:
-        print("Error fetching languages card:", e)
-        return []
+def compute_grade(stars, commits, prs, contributions):
+    """Compute a letter grade based on overall stats."""
+    score = 0
+    score += min(stars * 4, 100)
+    score += min(commits * 1.65, 250)
+    score += min(prs * 0.5, 20)
+    score += min(contributions * 2, 10)
+
+    if score >= 300:
+        return "A+"
+    elif score >= 250:
+        return "A"
+    elif score >= 200:
+        return "A-"
+    elif score >= 150:
+        return "B+"
+    elif score >= 100:
+        return "B"
+    elif score >= 50:
+        return "B-"
+    elif score >= 30:
+        return "C+"
+    else:
+        return "C"
 
 def generate_svg(stats, streak, langs, filepath):
     # Ensure dir exists
@@ -379,26 +407,30 @@ def generate_svg(stats, streak, langs, filepath):
     
     # Calculate dynamic height based on language count (2 columns)
     rows = (len(langs) + 1) // 2
-    # Base height without legend = 385 (header/stats/streaks) + 75 (language title + progress bar) = 460
-    # Legend rows take rows * 24px, plus 15px margin
-    height = 460 + (rows * 24) + 15
-    if height < 550:
-        height = 550
+    # Base height = 400 (header/stats/streaks) + 90 (lang title+bar) + rows*26 + 20 padding
+    height = 400 + 90 + (rows * 26) + 20
+    if height < 560:
+        height = 560
     
     # Compute grade circle colors
+    grade = stats.get("grade", "A+")
     grade_color = "#70A5FD"
-    if stats["grade"] == "A+":
+    grade_glow = "rgba(112,165,253,0.35)"
+    if grade == "A+":
         grade_color = "#BF91F3"
-    elif stats["grade"].startswith("A"):
+        grade_glow = "rgba(191,145,243,0.35)"
+    elif grade.startswith("A"):
         grade_color = "#38BDAE"
-    elif stats["grade"].startswith("B"):
+        grade_glow = "rgba(56,189,174,0.35)"
+    elif grade.startswith("B"):
         grade_color = "#FF9E64"
+        grade_glow = "rgba(255,158,100,0.35)"
         
     # Build Lang Progress Bar segments
     bar_x = 30
     bar_y = 50
     bar_width = 500
-    bar_height = 8
+    bar_height = 10
     bar_segments = []
     
     total_percentage = sum(l["percentage"] for l in langs)
@@ -408,20 +440,18 @@ def generate_svg(stats, streak, langs, filepath):
     current_x = bar_x
     for i, lang in enumerate(langs):
         seg_w = (lang["percentage"] / total_percentage) * bar_width
-        # Rounded corners for the very left and very right segments
-        rx = 4 if i == 0 or i == len(langs) - 1 else 0
         bar_segments.append(
-            f'<rect x="{current_x}" y="{bar_y}" width="{seg_w}" height="{bar_height}" fill="{lang["color"]}" />'
+            f'<rect x="{current_x:.2f}" y="{bar_y}" width="{seg_w:.2f}" height="{bar_height}" fill="{lang["color"]}" />'
         )
         current_x += seg_w
 
-    # Build Lang Legend grid
+    # Build Lang Legend grid (2 columns)
     legend_items = []
     grid_cols = 2
-    col_width = 240
-    start_x = 35
+    col_width = 245
+    start_x = 30
     start_y = 75
-    row_height = 24
+    row_height = 26
     
     for idx, lang in enumerate(langs):
         col = idx % grid_cols
@@ -430,17 +460,70 @@ def generate_svg(stats, streak, langs, filepath):
         y = start_y + (row * row_height)
         legend_items.append(f"""
         <g transform="translate({x}, {y})">
-            <circle cx="5" cy="5" r="5" fill="{lang["color"]}" />
-            <text x="18" y="9" fill="#A9B1D6" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" font-weight="500">{lang["name"]}</text>
-            <text x="180" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" text-anchor="end">{lang["percentage"]}%</text>
+            <circle cx="6" cy="5" r="5" fill="{lang["color"]}" />
+            <text x="19" y="9" fill="#A9B1D6" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="12px" font-weight="500">{lang["name"]}</text>
+            <text x="185" y="9" fill="#565F89" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-size="11.5px" text-anchor="end">{lang["percentage"]}%</text>
         </g>
         """)
         
     legend_svg = "\n".join(legend_items)
     bar_svg = "\n".join(bar_segments)
+
+    # Stats rows with mini icons
+    stat_rows = [
+        ("Total Stars",      stats["stars"],         "M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01z", "#FFD43B"),
+        ("Total Commits",    stats["commits"],       "M9 3v11.17L5.41 10.58 4 12l6 6 6-6-1.41-1.41L11 14.17V3H9zm-4 16h14v2H5z",              "#38BDAE"),
+        ("Total PRs",        stats["prs"],           "M6 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm0 8c2.67 0 8 1.34 8 4v2H-2v-2c0-2.66 5.33-4 8-4zm12-5h-4v2h4v4h2v-4h4v-2h-4V2h-2v4z", "#70A5FD"),
+        ("Total Issues",     stats["issues"],        "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z", "#FF9E64"),
+        ("Contributed to",   stats["contributions"], "M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z", "#BF91F3"),
+    ]
+
+    stats_svg_rows = []
+    for i, (label, value, icon_d, icon_color) in enumerate(stat_rows):
+        y = i * 34
+        stats_svg_rows.append(f"""
+        <g transform="translate(0, {y})">
+            <g transform="translate(0, -8) scale(0.75)">
+                <path d="{icon_d}" fill="{icon_color}" opacity="0.9"/>
+            </g>
+            <text x="22" y="4" class="stat-label">{label}:</text>
+            <text x="185" y="4" class="stat-value">{value}</text>
+        </g>""")
+    stats_svg = "\n".join(stats_svg_rows)
     
     # Formulate whole SVG content
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width}px" height="{height}px" viewBox="0 0 {width} {height}" direction="ltr">
+    <defs>
+        <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#13141f;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#1a1b2e;stop-opacity:1" />
+        </linearGradient>
+        <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#BF91F3;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#70A5FD;stop-opacity:1" />
+        </linearGradient>
+        <filter id="glow-grade">
+            <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+            <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+        <filter id="glow-streak">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+        <clipPath id="card-clip">
+            <rect width="{width}" height="{height}" rx="16" ry="16"/>
+        </clipPath>
+        <clipPath id="bar-clip">
+            <rect x="{bar_x}" y="{bar_y}" width="{bar_width}" height="{bar_height}" rx="5" />
+        </clipPath>
+    </defs>
+    
     <style>
         @keyframes currstreak {{
             0% {{ font-size: 3px; opacity: 0.2; }}
@@ -451,137 +534,144 @@ def generate_svg(stats, streak, langs, filepath):
             0% {{ opacity: 0; }}
             100% {{ opacity: 1; }}
         }}
+        @keyframes pulse-ring {{
+            0% {{ opacity: 0.8; transform: scale(0.95); }}
+            50% {{ opacity: 0.4; transform: scale(1.05); }}
+            100% {{ opacity: 0.8; transform: scale(0.95); }}
+        }}
+        @keyframes shimmer {{
+            0% {{ opacity: 0.6; }}
+            50% {{ opacity: 1; }}
+            100% {{ opacity: 0.6; }}
+        }}
         .title {{
-            fill: #BF91F3;
+            fill: url(#headerGrad);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Ubuntu, sans-serif;
-            font-weight: 700;
-            font-size: 18px;
+            font-weight: 800;
+            font-size: 17px;
+            letter-spacing: 0.3px;
         }}
         .stat-label {{
-            fill: #70A5FD;
+            fill: #8B97C8;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Ubuntu, sans-serif;
-            font-size: 14px;
+            font-size: 13.5px;
             font-weight: 500;
         }}
         .stat-value {{
-            fill: #38BDAE;
+            fill: #E8ECF8;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Ubuntu, sans-serif;
-            font-size: 14px;
+            font-size: 13.5px;
             font-weight: 700;
         }}
-        .card-border {{
-            stroke: #2F3147;
-            stroke-width: 1.5;
-            fill: #1A1B27;
-            rx: 10px;
+        .section-divider {{
+            stroke: #252640;
+            stroke-width: 1;
+        }}
+        .streak-label {{
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Ubuntu, sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+        }}
+        .streak-range {{
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Ubuntu, sans-serif;
+            font-weight: 400;
+            font-size: 11px;
+            fill: #565F89;
         }}
     </style>
     
-    <!-- Outer Card Background -->
-    <rect class="card-border" width="{width - 2}" height="{height - 2}" x="1" y="1" />
+    <!-- Card Background -->
+    <rect width="{width}" height="{height}" rx="16" ry="16" fill="url(#bgGrad)" />
+    <!-- Subtle border -->
+    <rect width="{width - 1}" height="{height - 1}" x="0.5" y="0.5" rx="16" ry="16" fill="none" stroke="#2A2C45" stroke-width="1" />
+    <!-- Top accent stripe -->
+    <rect width="{width}" height="3" rx="1" fill="url(#headerGrad)" opacity="0.8"/>
     
-    <!-- HEADER -->
-    <g transform="translate(30, 45)">
-        <!-- GitHub Stats Icon (Simplified Graph Icon) -->
-        <path d="M 0 10 L 5 10 L 5 -5 L 0 -5 Z M 8 10 L 13 10 L 13 -15 L 8 -15 Z M 16 10 L 21 10 L 21 0 L 16 0 Z" fill="#BF91F3" stroke="none"/>
-        <text x="32" y="8" class="title">My GitHub Statistics</text>
+    <!-- === HEADER === -->
+    <g transform="translate(28, 42)">
+        <!-- Icon -->
+        <g transform="translate(0, -16)">
+            <rect width="28" height="28" rx="6" fill="#1F2240"/>
+            <g transform="translate(4, 4) scale(0.83)">
+                <path d="M 0 12 L 5 12 L 5 -2 L 0 -2 Z M 8 12 L 13 12 L 13 -14 L 8 -14 Z M 16 12 L 21 12 L 21 2 L 16 2 Z" fill="url(#headerGrad)"/>
+            </g>
+        </g>
+        <text x="38" y="2" class="title">My GitHub Statistics</text>
     </g>
     
-    <!-- SECTION 1: Key Statistics -->
-    <g transform="translate(30, 80)">
-        <!-- Stats list -->
+    <!-- === SECTION 1: Key Statistics === -->
+    <g transform="translate(28, 72)">
+        {stats_svg}
+        
+        <!-- Grade Badge -->
+        <g transform="translate(385, 32)">
+            <!-- Outer glow ring (animated) -->
+            <circle cx="45" cy="45" r="48" fill="none" stroke="{grade_color}" stroke-width="1" opacity="0.25" style="animation: pulse-ring 3s ease-in-out infinite;"/>
+            <!-- Main ring -->
+            <circle cx="45" cy="45" r="42" fill="#1A1C32" stroke="{grade_color}" stroke-width="3" opacity="0.9" filter="url(#glow-grade)" style="animation: fadein 0.5s linear forwards 0.3s"/>
+            <!-- Inner accent ring -->
+            <circle cx="45" cy="45" r="36" fill="none" stroke="{grade_color}" stroke-width="0.8" opacity="0.3"/>
+            <!-- Grade text -->
+            <text x="45" y="56" fill="{grade_color}" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-weight="800" font-size="32px" text-anchor="middle" filter="url(#glow-grade)" style="animation: fadein 0.5s linear forwards 0.5s">
+                {grade}
+            </text>
+        </g>
+    </g>
+    
+    <!-- Section Divider -->
+    <line x1="28" y1="256" x2="532" y2="256" class="section-divider"/>
+    
+    <!-- === SECTION 2: Streaks === -->
+    <g transform="translate(0, 265)">
+        <!-- Current Streak box -->
         <g transform="translate(0, 0)">
-            <!-- Stars -->
-            <g transform="translate(0, 10)">
-                <text class="stat-label">Total Stars:</text>
-                <text x="180" class="stat-value">{stats["stars"]}</text>
-            </g>
-            <!-- Commits -->
-            <g transform="translate(0, 40)">
-                <text class="stat-label">Total Commits:</text>
-                <text x="180" class="stat-value">{stats["commits"]}</text>
-            </g>
-            <!-- PRs -->
-            <g transform="translate(0, 70)">
-                <text class="stat-label">Total PRs:</text>
-                <text x="180" class="stat-value">{stats["prs"]}</text>
-            </g>
-            <!-- Issues -->
-            <g transform="translate(0, 100)">
-                <text class="stat-label">Total Issues:</text>
-                <text x="180" class="stat-value">{stats["issues"]}</text>
-            </g>
-            <!-- Contributed to -->
-            <g transform="translate(0, 130)">
-                <text class="stat-label">Contributed to:</text>
-                <text x="180" class="stat-value">{stats["contributions"]}</text>
+            <rect x="18" y="8" width="240" height="100" rx="10" fill="#17192C" stroke="#252640" stroke-width="1"/>
+            <g transform="translate(138, 62)">
+                <!-- Fire Icon -->
+                <g transform="translate(-12, -52)">
+                    <path d="M 1.5 0.67 C 1.5 0.67 2.24 3.32 2.24 5.47 C 2.24 7.53 0.89 9.2 -1.17 9.2 C -3.23 9.2 -4.79 7.53 -4.79 5.47 L -4.76 5.11 C -6.78 7.51 -8 10.62 -8 13.99 C -8 18.41 -4.42 22 0 22 C 4.42 22 8 18.41 8 13.99 C 8 8.6 5.41 3.79 1.5 0.67 Z M -0.29 19 C -2.07 19 -3.51 17.6 -3.51 15.86 C -3.51 14.24 -2.46 13.1 -0.7 12.74 C 1.07 12.38 2.9 11.53 3.92 10.16 C 4.31 11.45 4.51 12.81 4.51 14.2 C 4.51 16.85 2.36 19 -0.29 19 Z" fill="#FF9E64" filter="url(#glow-streak)"/>
+                </g>
+                <!-- Number circle -->
+                <circle cx="0" cy="5" r="26" fill="none" stroke="#BF91F3" stroke-width="3" filter="url(#glow-streak)"/>
+                <text x="0" y="15" fill="#BF91F3" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-weight="700" font-size="26px" text-anchor="middle" filter="url(#glow-streak)" style="animation: currstreak 0.6s linear forwards">
+                    {streak["current_streak"]}
+                </text>
+                <text x="0" y="55" class="streak-label" fill="#BF91F3" text-anchor="middle">Current Streak</text>
+                <text x="0" y="72" class="streak-range" text-anchor="middle">{streak["current_range"]}</text>
             </g>
         </g>
         
-        <!-- Right side: Grade Badge -->
-        <g transform="translate(390, 45)">
-            <!-- Circle border -->
-            <circle cx="45" cy="45" r="45" fill="none" stroke="{grade_color}" stroke-width="4.5" style="opacity: 0.8; animation: fadein 0.5s linear forwards 0.3s" />
-            <!-- Grade character -->
-            <text x="45" y="56" fill="{grade_color}" stroke="none" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-weight="800" font-size="34px" text-anchor="middle" style="animation: fadein 0.5s linear forwards 0.5s">
-                {stats["grade"]}
-            </text>
+        <!-- Longest Streak box -->
+        <g transform="translate(302, 0)">
+            <rect x="0" y="8" width="240" height="100" rx="10" fill="#17192C" stroke="#252640" stroke-width="1"/>
+            <g transform="translate(120, 62)">
+                <!-- Trophy icon -->
+                <g transform="translate(-12, -52)">
+                    <path d="M 5 0 L 19 0 L 19 2 L 21 2 C 22.1 2 23 2.9 23 4 L 23 7 C 23 9.44 21.28 11.48 19 11.9 L 19 14 C 19 15.1 18.1 16 17 16 L 15 16 L 15 18 L 18 18 L 18 20 L 6 20 L 6 18 L 9 18 L 9 16 L 7 16 C 5.9 16 5 15.1 5 14 L 5 11.9 C 2.72 11.48 1 9.44 1 7 L 1 4 C 1 2.9 1.9 2 3 2 L 5 2 Z M 3 4 L 3 7 L 5 7 L 5 4 Z M 19 7 L 21 7 L 21 4 L 19 4 Z" fill="#FFD43B" opacity="0.9"/>
+                </g>
+                <text x="0" y="15" fill="#70A5FD" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-weight="700" font-size="26px" text-anchor="middle" filter="url(#glow-streak)">
+                    {streak["longest_streak"]}
+                </text>
+                <text x="0" y="55" class="streak-label" fill="#70A5FD" text-anchor="middle">Longest Streak</text>
+                <text x="0" y="72" class="streak-range" text-anchor="middle">{streak["longest_range"]}</text>
+            </g>
         </g>
     </g>
     
-    <!-- Divider Line -->
-    <line x1="30" y1="245" x2="530" y2="245" stroke="#2F3147" stroke-width="1.5" />
+    <!-- Section Divider -->
+    <line x1="28" y1="388" x2="532" y2="388" class="section-divider"/>
     
-    <!-- SECTION 2: Streaks -->
-    <g transform="translate(0, 250)">
-        <!-- Current Streak -->
-        <g transform="translate(140, 50)">
-            <!-- Fire Icon -->
-            <g transform="translate(-10, -50)" scale="0.9">
-                <path d="M 1.5 0.67 C 1.5 0.67 2.24 3.32 2.24 5.47 C 2.24 7.53 0.89 9.2 -1.17 9.2 C -3.23 9.2 -4.79 7.53 -4.79 5.47 L -4.76 5.11 C -6.78 7.51 -8 10.62 -8 13.99 C -8 18.41 -4.42 22 0 22 C 4.42 22 8 18.41 8 13.99 C 8 8.6 5.41 3.79 1.5 0.67 Z M -0.29 19 C -2.07 19 -3.51 17.6 -3.51 15.86 C -3.51 14.24 -2.46 13.1 -0.7 12.74 C 1.07 12.38 2.9 11.53 3.92 10.16 C 4.31 11.45 4.51 12.81 4.51 14.2 C 4.51 16.85 2.36 19 -0.29 19 Z" fill="#FF9E64"/>
-            </g>
-            <!-- Number Circle -->
-            <circle cx="0" cy="5" r="28" fill="none" stroke="#BF91F3" stroke-width="4.5" />
-            <text x="0" y="15" fill="#BF91F3" stroke="none" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-weight="700" font-size="28px" text-anchor="middle" style="animation: currstreak 0.6s linear forwards">
-                {streak["current_streak"]}
-            </text>
-            
-            <text x="0" y="55" fill="#BF91F3" stroke="none" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-weight="700" font-size="14px" text-anchor="middle">Current Streak</text>
-            <text x="0" y="75" fill="#38BDAE" stroke="none" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-weight="400" font-size="12px" text-anchor="middle">{streak["current_range"]}</text>
-        </g>
-        
-        <!-- Divider -->
-        <line x1="280" y1="15" x2="280" y2="105" stroke="#2F3147" stroke-width="1.5" />
-        
-        <!-- Longest Streak -->
-        <g transform="translate(420, 50)">
-            <text x="0" y="15" fill="#70A5FD" stroke="none" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-weight="700" font-size="28px" text-anchor="middle">
-                {streak["longest_streak"]}
-            </text>
-            <text x="0" y="55" fill="#70A5FD" stroke="none" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-weight="700" font-size="14px" text-anchor="middle">Longest Streak</text>
-            <text x="0" y="75" fill="#38BDAE" stroke="none" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif" font-weight="400" font-size="12px" text-anchor="middle">{streak["longest_range"]}</text>
-        </g>
-    </g>
-    
-    <!-- Divider Line -->
-    <line x1="30" y1="375" x2="530" y2="375" stroke="#2F3147" stroke-width="1.5" />
-    
-    <!-- SECTION 3: Programming Languages -->
-    <g transform="translate(0, 385)">
-        <text x="30" y="25" class="title">My Programming Languages</text>
+    <!-- === SECTION 3: Programming Languages === -->
+    <g transform="translate(0, 397)">
+        <text x="28" y="28" class="title">Programming Languages</text>
         
         <!-- Progress Bar Background (Rounded Track) -->
-        <rect x="{bar_x}" y="{bar_y}" width="{bar_width}" height="{bar_height}" fill="#2F3147" rx="4" />
+        <rect x="{bar_x}" y="{bar_y}" width="{bar_width}" height="{bar_height}" fill="#1F2240" rx="5" />
         
         <!-- Progress Bar Segments -->
         <g clip-path="url(#bar-clip)">
             {bar_svg}
         </g>
-        
-        <!-- Clip Path to round progress bar edges -->
-        <clipPath id="bar-clip">
-            <rect x="{bar_x}" y="{bar_y}" width="{bar_width}" height="{bar_height}" rx="4" />
-        </clipPath>
         
         <!-- Legend Grid -->
         {legend_svg}
@@ -597,12 +687,14 @@ def main():
     print(f"Fetching GitHub stats for user: {username}")
     token = os.environ.get("GITHUB_TOKEN")
     
-    # Try direct GitHub API first
-    github_stats = fetch_from_github_api(username, token)
+    if token:
+        print("GitHub token found - using authenticated API (5000 req/hr limit)")
+    else:
+        print("WARNING: No GitHub token found - using unauthenticated API (60 req/hr limit)")
+        print("         Commit counts may be inaccurate due to rate limiting.")
     
-    # Fetch from Vercel as secondary source / fallback
-    print("Fetching Vercel stats card...")
-    vercel_stats = get_stats(username)
+    # Fetch from GitHub API (primary source - most accurate)
+    github_stats = fetch_from_github_api(username, token)
     
     stats = {
         "stars": "0",
@@ -614,23 +706,29 @@ def main():
         "languages": []
     }
     
-    if vercel_stats:
-        stats.update(vercel_stats)
-        vercel_langs = get_languages(username)
-        if vercel_langs:
-            stats["languages"] = vercel_langs
-            
     if github_stats:
-        print("Merging direct GitHub API stats...")
+        print("Merging GitHub API stats...")
         for k in ["stars", "commits", "prs", "issues", "contributions"]:
             val = github_stats.get(k)
             if val and val != "0":
                 stats[k] = val
         if github_stats.get("languages") and len(github_stats["languages"]) > 0:
             stats["languages"] = github_stats["languages"]
-        if github_stats.get("grade"):
-            stats["grade"] = github_stats["grade"]
             
+    # Compute grade from actual stats
+    try:
+        computed_grade = compute_grade(
+            int(stats["stars"]),
+            int(stats["commits"]),
+            int(stats["prs"]),
+            int(stats["contributions"])
+        )
+        stats["grade"] = computed_grade
+        print(f"Computed grade: {computed_grade}")
+    except Exception as e:
+        print(f"Warning: Could not compute grade: {e}")
+        stats["grade"] = "A+"
+
     # Apply manual commits override if present in README.md
     manual_commits_val = get_manual_commits()
     if manual_commits_val:
@@ -643,8 +741,12 @@ def main():
             except Exception as e:
                 print("Error applying relative commits offset:", e)
         else:
-            stats["commits"] = manual_commits_val
-            print(f"Applied absolute commits override {manual_commits_val} from README.md.")
+            # Only use manual override if we got 0 from the API (fallback)
+            if stats["commits"] == "0":
+                stats["commits"] = manual_commits_val
+                print(f"API returned 0 commits - applied manual override {manual_commits_val} from README.md.")
+            else:
+                print(f"API returned {stats['commits']} commits - ignoring manual override {manual_commits_val} in README.md.")
             
     print("Final stats calculated:")
     print(" - Stars:", stats["stars"])
